@@ -9,6 +9,7 @@ public class cardLogics
 
     public Card addCard(Card card)
     {
+        
         myHand.addElement(card);
         return card;
     }

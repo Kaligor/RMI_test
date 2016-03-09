@@ -13,12 +13,14 @@ import java.rmi.RemoteException;
  */
 public class BasicCards extends javax.swing.JFrame
 {
+
     cardLogics cardLogic = new cardLogics();
     Network network = new Network();
-    
+    Utility util = new Utility();
+
     int Player;
     int Player2;
-    
+
     /**
      * Creates new form BasicCards
      */
@@ -52,12 +54,32 @@ public class BasicCards extends javax.swing.JFrame
         yourHandList = new javax.swing.JList<>();
         opponentHand = new javax.swing.JLabel();
         deck = new javax.swing.JButton();
+        shuffle = new javax.swing.JButton();
+        refill = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter()
+        {
+            public void windowClosing(java.awt.event.WindowEvent evt)
+            {
+                formWindowClosing(evt);
+            }
+        });
 
         yourHandList.setModel(cardLogic.myHand);
         yourHandList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        yourHandList.setCellRenderer(util.newCellRenderer());
+        yourHandList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        yourHandList.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
+        yourHandList.setVisibleRowCount(1);
+        yourHandList.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
+                yourHandListMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(yourHandList);
 
         opponentHand.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -72,30 +94,56 @@ public class BasicCards extends javax.swing.JFrame
             }
         });
 
+        shuffle.setText("SHUFFLE");
+        shuffle.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                shuffleActionPerformed(evt);
+            }
+        });
+
+        refill.setText("REFILL");
+        refill.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                refillActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout MainPanelLayout = new javax.swing.GroupLayout(MainPanel);
         MainPanel.setLayout(MainPanelLayout);
         MainPanelLayout.setHorizontalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(MainPanelLayout.createSequentialGroup()
-                .addGap(242, 242, 242)
-                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(opponentHand, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(218, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(deck)
-                .addGap(152, 152, 152))
+                .addGap(0, 145, Short.MAX_VALUE)
+                .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 507, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addGroup(MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(shuffle)
+                            .addComponent(deck)
+                            .addComponent(refill))
+                        .addGap(26, 26, 26))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
+                        .addComponent(opponentHand, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(310, 310, 310))))
         );
         MainPanelLayout.setVerticalGroup(
             MainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, MainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(opponentHand)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 148, Short.MAX_VALUE)
+                .addGap(147, 147, 147)
+                .addComponent(shuffle)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(deck)
-                .addGap(63, 63, 63)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(refill)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 184, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -115,13 +163,59 @@ public class BasicCards extends javax.swing.JFrame
 
     private void deckActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deckActionPerformed
     {//GEN-HEADEREND:event_deckActionPerformed
-        try {
-            System.out.println(cardLogic.addCard(network.Remote.drawCardFromDeck(Player)));        
-        } catch (RemoteException e) {
+        try
+        {
+            if (cardLogic.myHand.size() < 5)
+            {
+                cardLogic.addCard(network.Remote.drawCardFromDeck(Player));
+            }
+        } catch (RemoteException e)
+        {
             e.printStackTrace();
             //System.err.println("Something went wrong in the Draw Card from deck Action");
         }
     }//GEN-LAST:event_deckActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
+    {//GEN-HEADEREND:event_formWindowClosing
+        try
+        {
+            network.Remote.disconnect(Player);
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void shuffleActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_shuffleActionPerformed
+    {//GEN-HEADEREND:event_shuffleActionPerformed
+        try
+        {
+            network.Remote.shuffleDeck();
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_shuffleActionPerformed
+
+    private void refillActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_refillActionPerformed
+    {//GEN-HEADEREND:event_refillActionPerformed
+        try
+        {
+            network.Remote.reset();
+        } catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_refillActionPerformed
+
+    private void yourHandListMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_yourHandListMouseClicked
+    {//GEN-HEADEREND:event_yourHandListMouseClicked
+        if(evt.getButton() == 1) {
+//            System.out.println(evt.toString());
+            cardLogic.myHand.remove(yourHandList.getSelectedIndex());
+        }
+    }//GEN-LAST:event_yourHandListMouseClicked
 
     public final void otherPlayer()
     {
@@ -133,7 +227,7 @@ public class BasicCards extends javax.swing.JFrame
             Player2 = 1;
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -184,6 +278,8 @@ public class BasicCards extends javax.swing.JFrame
     private javax.swing.JButton deck;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel opponentHand;
+    private javax.swing.JButton refill;
+    private javax.swing.JButton shuffle;
     private javax.swing.JList<Card> yourHandList;
     // End of variables declaration//GEN-END:variables
 }
