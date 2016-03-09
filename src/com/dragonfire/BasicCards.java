@@ -116,9 +116,10 @@ public class BasicCards extends javax.swing.JFrame
     private void deckActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deckActionPerformed
     {//GEN-HEADEREND:event_deckActionPerformed
         try {
-        cardLogic.addCard(network.Remote.drawCardFromDeck(Player));        
+            System.out.println(cardLogic.addCard(network.Remote.drawCardFromDeck(Player)));        
         } catch (RemoteException e) {
-            System.err.println("Something went wrong in the Draw Card from deck Action");
+            e.printStackTrace();
+            //System.err.println("Something went wrong in the Draw Card from deck Action");
         }
     }//GEN-LAST:event_deckActionPerformed
 
