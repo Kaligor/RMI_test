@@ -5,6 +5,7 @@
  */
 package com.dragonfire;
 
+import com.dragonfire.Network;
 import java.awt.event.ActionEvent;
 import java.rmi.RemoteException;
 import javax.swing.Timer;
@@ -15,7 +16,7 @@ import javax.swing.Timer;
  */
 public class Main extends javax.swing.JFrame
 {
-    Logic logic;
+    Network logic;
     Timer timer;
     int Player = -1;
     int Player2 = -1;
@@ -26,10 +27,10 @@ public class Main extends javax.swing.JFrame
     public Main()
     { 
         initComponents();
-        logic = new Logic();
+        logic = new Network();
         try
         {
-            Player = logic.stub.assignPlayer();
+            Player = logic.Remote.assignPlayer();
             otherPlayer();
             System.out.println(Player);
             System.out.println(Player2);
@@ -123,7 +124,7 @@ public class Main extends javax.swing.JFrame
     {//GEN-HEADEREND:event_Increase1ActionPerformed
         try
         {
-            logic.stub.increaseValue(Player);
+            logic.Remote.increaseValue(Player);
         } catch (RemoteException e)
         {
             System.out.println("Increaseing Value, did not work");
@@ -138,12 +139,12 @@ public class Main extends javax.swing.JFrame
                 {
                     try
                     {
-                        increaseTimesPlayer1.setText("" + logic.stub.getValue(Player));
-                        if (logic.stub.getReady())
+                        increaseTimesPlayer1.setText("" + logic.Remote.getValue(Player));
+                        if (logic.Remote.getReady())
                         {
-                            increaseTimesPlayer2.setText("" + logic.stub.getValue(Player2));
+                            increaseTimesPlayer2.setText("" + logic.Remote.getValue(Player2));
                         }
-                        Value.setText("" + logic.stub.getValue(9));
+                        Value.setText("" + logic.Remote.getValue(9));
 
                     } catch (RemoteException f)
                     {
